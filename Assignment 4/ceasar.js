@@ -1,10 +1,9 @@
 
 var alphabet = [..."abcdefghijklmnopqrstuvwxyz1234567890"] ;
 
-//the probability of each letter in a sample English text (in percentage)
+//the probability of each letter (a - z) in a sample English text (in percentage)
 //https://en.wikipedia.org/wiki/Letter_frequency
 
-//					a	   b	  c		 d		 e		f	   g	  h		 i		j	   k	  l		 m		n	   o	  p		 q		r	   s	  t		 u		v	   w	 x	   y	  z
 var probability = [8.167, 1.492, 2.782, 4.253, 12.702, 2.228, 2.015, 6.094, 6.996, 0.153, 0.772, 4.025, 2.406, 6.749, 7.507, 1.929, 0.095, 5.987, 6.327, 9.056, 2.758, 0.978, 2.36, 0.15, 1.974, 0.074] ;
 
 
