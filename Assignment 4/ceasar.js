@@ -1,79 +1,48 @@
-var set;
-var shiftval = 0;
-function encipher(){
-    shiftval = parseInt(document.getElementById('shift').value);
-    set = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    set = [...set];
-    var text1 = document.getElementById('input').value;
-    var textArr = [...text1];
-    var newArr = [...text1];
-    var size = textArr.length;
-    var curr = '';
 
-    for(i = 0; i < size; i++){
-            curr = textArr[i];
-            curr = findIndex(curr);
-            curr = (curr) % 62;
-            newArr[i] = set[curr];
-    }
-    document.getElementById("response").innerHTML = newArr.join('');
+var alphabet = [..."abcdefghijklmnopqrstuvwxyz1234567890"] ;
 
+//the probability of each letter in a sample English text (in percentage)
+//https://en.wikipedia.org/wiki/Letter_frequency
+
+//					a	   b	  c		 d		 e		f	   g	  h		 i		j	   k	  l		 m		n	   o	  p		 q		r	   s	  t		 u		v	   w	 x	   y	  z
+var probability = [8.167, 1.492, 2.782, 4.253, 12.702, 2.228, 2.015, 6.094, 6.996, 0.153, 0.772, 4.025, 2.406, 6.749, 7.507, 1.929, 0.095, 5.987, 6.327, 9.056, 2.758, 0.978, 2.36, 0.15, 1.974, 0.074] ;
+
+
+function cipher() {
+	var text = [...document.getElementById('input').value] ;
+	for (var x = 0 ; x < text.length ; x++) {
+		text[x] = text[x].toLowerCase() ; //converting all text to lower case (I feel it has more readability)
+	}
+	
+	var output = "" ;
+	var smallestError = Infinity ; //we essentially return the deciphered text with the closest lexographic probability
+	for (var x = 0 ; x < alphabet.length ; x++) {
+		var deciphered = [] ;
+		for (var i = 0 ; i < text.length ; i++) {
+			if (alphabet.indexOf(text[i]) != -1)
+				deciphered.push(alphabet[(alphabet.indexOf(text[i]) + x) % alphabet.length]) ;
+		}
+		var e = findError(deciphered) ;
+		if (e < smallestError) {
+			smallestError = e ;
+			output = deciphered.join('') ;
+		}
+	}
+    document.getElementById("response").innerHTML = output ;
 }
 
-function decipher(){
-    shiftval = parseInt(document.getElementById('shift').value);
-    set = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    set = [...set];
-    var text1 = document.getElementById('input').value;
-    var textArr = [...text1];
-    var newArr = [...text1];
-    var size = textArr.length;
-    var curr = '';
-
-    for(i = 0; i < size; i++){
-            curr = textArr[i];
-            curr = DfindIndex(curr);
-            curr = (curr) % 62;
-            newArr[i] = set[curr];
-    }
-    document.getElementById("response").innerHTML = newArr.join('');
-}
-
-
-function findIndex(curr){
-    
-    var found = false;
-    var i = 0;
-    while(!found && i < 63){
-        if(curr == set[i]){
-            found = true;
-        }
-        i = i + 1;
-    }
-  
-    return i + shiftval - 1;
-}
-
-function DfindIndex(curr){
-    
-    var found = false;
-    var i = 0;
-    var ret;
-    while(!found && i < 63){
-        if(curr == set[i]){
-            found = true;
-            ret = i - shiftval;
-            if(ret < 0){
-                return 62 + ret;
-            }
-
-            return ret;
-        }
-        i = i + 1;
-
-       
-    }
-  
-     return;
-    
+//find the probability error for the deciphered text
+function findError(deciphered) {
+	var size = 0 ;
+	for (var x = 0 ; x < 26 ; x++) {
+		size += (deciphered.join('').split(alphabet[x]).length - 1) ; //number of alphabetic characters in deciphered text
+	}
+	
+	var error = 0 ;
+	for (var x = 0 ; x < 26 ; x++) {
+		var prob = (deciphered.join('').split(alphabet[x]).length - 1) / size ; //probability of each letter
+		error += Math.abs(100*prob - probability[x]) ; //accumalating probability
+	}
+	
+	return error ;
 }
